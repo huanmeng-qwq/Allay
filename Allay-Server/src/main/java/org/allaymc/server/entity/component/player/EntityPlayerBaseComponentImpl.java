@@ -813,16 +813,16 @@ public class EntityPlayerBaseComponentImpl extends EntityBaseComponentImpl imple
     @Override
     public void knockback(Vector3fc source, float kb) {
         var kbMotion = calculateKnockbackMotion(source, kb);
-        setMotion(kbMotion);
-    }
-
-    @Override
-    public void setMotionValueOnly(Vector3fc motion) {
-        this.motion = new Vector3f(motion);
+        sendMotion(kbMotion);
     }
 
     @Override
     public void setMotion(Vector3fc motion) {
+        this.motion = new Vector3f(motion);
+    }
+
+    @Override
+    public void sendMotion(Vector3fc motion) {
         // For player, motion effect is calculated by the client rather than the server
         // We only need to send SetEntityMotionPacket to client when
         // we want to apply motion on a player

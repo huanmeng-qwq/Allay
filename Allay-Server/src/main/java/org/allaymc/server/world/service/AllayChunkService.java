@@ -362,8 +362,6 @@ public final class AllayChunkService implements ChunkService {
         };
         // Save all chunk hash values that have been sent in the last tick
         private final LongOpenHashSet sentChunks = new LongOpenHashSet();
-        // Save all chunk hash values that will be sent in this tick
-        private final LongOpenHashSet inRadiusChunks = new LongOpenHashSet();
         private final int chunkTrySendCountPerTick;
         private final LongArrayFIFOQueue chunkSendingQueue;
         private AsyncChunkSendingManager asyncChunkSendingManager;
@@ -392,41 +390,32 @@ public final class AllayChunkService implements ChunkService {
             if ((currentLoaderChunkPosHashed = HashUtils.hashXZ(floor.x >> 4, floor.z >> 4)) != lastLoaderChunkPosHashed) {
                 lastLoaderChunkPosHashed = currentLoaderChunkPosHashed;
                 updateInRadiusChunks(floor);
-                removeOutOfRadiusChunks();
-                updateChunkSendingQueue();
             }
             loadAndSendQueuedChunks();
         }
 
         private void updateInRadiusChunks(Vector3i currentPos) {
-            inRadiusChunks.clear();
+            chunkSendingQueue.clear();
             var loaderChunkX = currentPos.x >> 4;
             var loaderChunkZ = currentPos.z >> 4;
             var chunkLoadingRadius = chunkLoader.getChunkLoadingRadius();
+            var mustBeLoad = new HashSet<Long>();
             for (int rx = -chunkLoadingRadius; rx <= chunkLoadingRadius; rx++) {
                 for (int rz = -chunkLoadingRadius; rz <= chunkLoadingRadius; rz++) {
-                    if (!isChunkInRadius(rx, rz, chunkLoadingRadius)) continue;
                     var chunkX = loaderChunkX + rx;
                     var chunkZ = loaderChunkZ + rz;
                     var hashXZ = HashUtils.hashXZ(chunkX, chunkZ);
-                    inRadiusChunks.add(hashXZ);
+                    // Unload chunks out of range
+                    if (!isChunkInRadius(rx, rz, chunkLoadingRadius)) {
+                        chunkLoader.unloadChunk(hashXZ);
+                        sentChunks.remove(hashXZ);
+                    } else if (!sentChunks.contains(hashXZ)) {
+                        mustBeLoad.add(hashXZ);
+                    }
                 }
             }
-        }
 
-        private void removeOutOfRadiusChunks() {
-            var difference = Sets.difference(sentChunks, inRadiusChunks);
-            // Unload chunks out of range
-            chunkLoader.onChunkOutOfRange(difference);
-            // The intersection of sentChunks and inRadiusChunks
-            sentChunks.removeAll(difference);
-        }
-
-        private void updateChunkSendingQueue() {
-            chunkSendingQueue.clear();
-            // Blocks that have already been sent will not be resent
-            var difference = Sets.difference(inRadiusChunks, sentChunks);
-            difference.stream().sorted(chunkDistanceComparatorHashed).forEachOrdered(v -> chunkSendingQueue.enqueue(v.longValue()));
+            mustBeLoad.stream().sorted(chunkDistanceComparatorHashed).forEachOrdered(v -> chunkSendingQueue.enqueue(v.longValue()));
         }
 
         private void loadAndSendQueuedChunks() {

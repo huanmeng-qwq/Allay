@@ -35,15 +35,13 @@ public class AllayBlockUpdateService implements BlockUpdateService {
 
         positions.forEach(pos -> {
             var layer0 = dimension.getBlockState(pos);
-            var layer1 = dimension.getBlockState(pos, 1);
             var block0 = new BlockStateWithPos(layer0, new Position3i(pos, dimension), 0);
-
             if (callScheduleUpdateEvent(block0)) {
                 return;
             }
-
             layer0.getBehavior().onScheduledUpdate(block0);
 
+            var layer1 = dimension.getBlockState(pos, 1);
             if (layer1.getBehavior() instanceof BlockLiquidComponent) {
                 var block1 = new BlockStateWithPos(layer1, new Position3i(pos, dimension), 1);
 
@@ -63,7 +61,6 @@ public class AllayBlockUpdateService implements BlockUpdateService {
             var neighborPos = update.neighborPos();
 
             var layer0 = dimension.getBlockState(pos);
-            var layer1 = dimension.getBlockState(pos, 1);
 
             var block0 = new BlockStateWithPos(layer0, new Position3i(pos, dimension), 0);
             var neighborBlock0 = new BlockStateWithPos(dimension.getBlockState(neighborPos), new Position3i(neighborPos, dimension), 0);
@@ -78,6 +75,7 @@ public class AllayBlockUpdateService implements BlockUpdateService {
                     blockFace
             );
 
+            var layer1 = dimension.getBlockState(pos, 1);
             if (layer1.getBehavior() instanceof BlockLiquidComponent) {
                 var block1 = new BlockStateWithPos(layer1, new Position3i(pos, dimension), 1);
 

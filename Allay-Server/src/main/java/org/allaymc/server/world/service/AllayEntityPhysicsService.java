@@ -379,6 +379,7 @@ public class AllayEntityPhysicsService implements EntityPhysicsService {
 
         var blocks = dimension.getCollidingBlocks(extendAxis);
         if (blocks != null) {
+            motion = 0;
             collision = axis != Y || shouldTowardsNegative;
 
             // There is a collision
@@ -388,14 +389,13 @@ public class AllayEntityPhysicsService implements EntityPhysicsService {
             var coordinate = shouldTowardsNegative ? aabb.getMin(axis) : aabb.getMax(axis);
             if (isInRange(minAxis, coordinate, maxAxis)) {
                 // Stuck into the block
-                deltaAxis = 0;
+                // deltaAxis must be 0 so we can stop it
+                return new FloatBooleanImmutablePair(motion, collision);
             } else {
                 deltaAxis = min(abs(coordinate - minAxis), abs(coordinate - maxAxis));
+                if (deltaAxis <= FAT_AABB_MARGIN) return new FloatBooleanImmutablePair(motion, collision); // deltaAxis must be 0 so we can stop it
                 if (shouldTowardsNegative) deltaAxis = -deltaAxis;
-                if (abs(deltaAxis) <= FAT_AABB_MARGIN) deltaAxis = 0;
             }
-
-            motion = 0;
         }
 
         // Move the collision box
@@ -473,7 +473,7 @@ public class AllayEntityPhysicsService implements EntityPhysicsService {
 
                 // Calculate delta pos (motion)
                 var motion = event.getTo().sub(player.getLocation(), new Vector3f());
-                player.setMotionValueOnly(motion);
+                player.setMotion(motion);
                 if (updateEntityLocation(player, clientMove.newLoc()))
                     entityAABBTree.update(player);
                 // ClientMove is not calculated by the server, but we need to calculate the onGround status
