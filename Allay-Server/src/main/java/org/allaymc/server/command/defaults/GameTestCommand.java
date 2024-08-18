@@ -197,7 +197,7 @@ public class GameTestCommand extends SimpleCommand {
                 .floatNum("my")
                 .floatNum("mz")
                 .exec((context, player) -> {
-                    player.sendMotion(new Vector3f(context.getResult(1), context.getResult(2), context.getResult(3)));
+                    player.setMotionValueOnly(new Vector3f(context.getResult(1), context.getResult(2), context.getResult(3)));
                     return context.success();
                 }, SenderType.PLAYER)
                 .root()

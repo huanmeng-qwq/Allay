@@ -213,5 +213,5 @@ public interface EntityPlayerBaseComponent extends EntityBaseComponent, ChunkLoa
 
     void setMovementSpeed(float speed);
 
-    void sendMotion(Vector3fc motion);
+    void setMotionValueOnly(Vector3fc motion);
 }

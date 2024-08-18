@@ -473,7 +473,7 @@ public class AllayEntityPhysicsService implements EntityPhysicsService {
 
                 // Calculate delta pos (motion)
                 var motion = event.getTo().sub(player.getLocation(), new Vector3f());
-                player.setMotion(motion);
+                player.setMotionValueOnly(motion);
                 if (updateEntityLocation(player, clientMove.newLoc()))
                     entityAABBTree.update(player);
                 // ClientMove is not calculated by the server, but we need to calculate the onGround status
