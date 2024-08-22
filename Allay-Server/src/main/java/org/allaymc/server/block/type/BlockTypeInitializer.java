@@ -27,10 +27,7 @@ import org.allaymc.api.math.voxelshape.CommonShapes;
 import org.allaymc.server.block.component.*;
 import org.allaymc.server.block.component.button.BlockButtonBaseComponentImpl;
 import org.allaymc.server.block.component.button.BlockWoodenButtonBaseComponentImpl;
-import org.allaymc.server.block.component.BlockFallableBaseComponentImpl;
-import org.allaymc.server.block.component.grass.BlockShortGrassBaseComponentImpl;
-import org.allaymc.server.block.component.BlockStateDataComponentImpl;
-import org.allaymc.server.block.component.grass.BlockTallGrassBaseComponentImpl;
+import org.allaymc.server.block.component.grass.*;
 import org.allaymc.server.block.component.door.BlockDoorBaseComponentImpl;
 import org.allaymc.server.block.component.sign.BlockHangingSignBaseComponentImpl;
 import org.allaymc.server.block.component.sign.BlockStandingSignBaseComponentImpl;
@@ -226,6 +223,32 @@ public final class BlockTypeInitializer {
                 .builder(BlockGrassBlockBehavior.class)
                 .vanillaBlock(VanillaBlockId.GRASS_BLOCK)
                 .setBlockBaseComponentSupplier(BlockGrassBlockBaseComponentImpl::new)
+                .build();
+        BlockTypes.GRASS_PATH = BlockTypeBuilder
+                .builder(BlockGrassPathBehavior.class)
+                .vanillaBlock(VanillaBlockId.GRASS_PATH)
+                .setBlockBaseComponentSupplier(BlockGrassPathBaseComponentImpl::new)
+                .build();
+        BlockTypes.FARMLAND = BlockTypeBuilder
+                .builder(BlockFarmlandBehavior.class)
+                .vanillaBlock(VanillaBlockId.FARMLAND)
+                .setProperties(VanillaBlockPropertyTypes.MOISTURIZED_AMOUNT)
+                .setBlockBaseComponentSupplier(BlockFarmlandBaseComponentImpl::new)
+                .build();
+        BlockTypes.MYCELIUM = BlockTypeBuilder
+                .builder(BlockMyceliumBehavior.class)
+                .vanillaBlock(VanillaBlockId.MYCELIUM)
+                .setBlockBaseComponentSupplier(BlockMyceliumBaseComponentImpl::new)
+                .build();
+        BlockTypes.CRIMSON_NYLIUM = BlockTypeBuilder
+                .builder(BlockCrimsonNyliumBehavior.class)
+                .vanillaBlock(VanillaBlockId.CRIMSON_NYLIUM)
+                .setBlockBaseComponentSupplier(BlockNyliumBaseComponentImpl::new)
+                .build();
+        BlockTypes.WARPED_NYLIUM = BlockTypeBuilder
+                .builder(BlockWarpedNyliumBehavior.class)
+                .vanillaBlock(VanillaBlockId.WARPED_NYLIUM)
+                .setBlockBaseComponentSupplier(BlockNyliumBaseComponentImpl::new)
                 .build();
     }
 

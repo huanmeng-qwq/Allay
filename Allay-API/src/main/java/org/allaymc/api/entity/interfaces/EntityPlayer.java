@@ -1,5 +1,6 @@
 package org.allaymc.api.entity.interfaces;
 
+import org.allaymc.api.block.type.BlockState;
 import org.allaymc.api.container.Container;
 import org.allaymc.api.container.FullContainerType;
 import org.allaymc.api.entity.Entity;
@@ -9,8 +10,10 @@ import org.allaymc.api.entity.component.player.*;
 import org.allaymc.api.eventbus.event.player.PlayerDropItemEvent;
 import org.allaymc.api.item.ItemStack;
 import org.allaymc.api.item.interfaces.ItemAirStack;
+import org.allaymc.api.math.position.Position3f;
 import org.allaymc.api.utils.MathUtils;
 import org.cloudburstmc.protocol.bedrock.data.GameType;
+import org.cloudburstmc.protocol.bedrock.data.SoundEvent;
 import org.cloudburstmc.protocol.bedrock.data.inventory.ContainerSlotType;
 import org.cloudburstmc.protocol.bedrock.packet.AnimatePacket;
 import org.joml.Vector3f;
@@ -113,6 +116,23 @@ public interface EntityPlayer extends
         var itemStack = inv.getItemInHand();
         if (itemStack.getCount() != 0) inv.onSlotChange(inv.getHandSlot());
         else inv.setItemInHand(ItemAirStack.AIR_STACK);
+    }
+
+
+    default void onUseItemInHandOn(Position3f pos, BlockState blockState) {
+        onUseItemOn(getItemInHand(), pos, blockState);
+    }
+
+    default void onUseItemOn(ItemStack item, Position3f pos, BlockState blockState) {
+        if (item.getItemData().isDamageable()) {
+            item.increaseDurability(1);
+        }
+        
+        swingArm();
+        pos.dimension().addLevelSoundEvent(
+                pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f,
+                SoundEvent.ITEM_USE_ON, blockState.blockStateHash()
+        );
     }
 
     default void swingArm() {
