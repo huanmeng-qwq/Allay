@@ -1,7 +1,5 @@
 package org.allaymc.server.block.component.door;
 
-import java.util.Set;
-
 import org.allaymc.api.block.BlockBehavior;
 import org.allaymc.api.block.BlockStateWithPos;
 import org.allaymc.api.block.component.RequireBlockProperty;
@@ -10,10 +8,8 @@ import org.allaymc.api.block.property.type.BlockPropertyType;
 import org.allaymc.api.block.type.BlockState;
 import org.allaymc.api.block.type.BlockType;
 import org.allaymc.api.data.BlockFace;
-import org.allaymc.api.data.VanillaBlockTags;
 import org.allaymc.api.entity.Entity;
 import org.allaymc.api.item.ItemStack;
-import org.allaymc.api.utils.Utils;
 import org.allaymc.api.world.Dimension;
 import org.allaymc.server.block.component.BlockBaseComponentImpl;
 import org.cloudburstmc.protocol.bedrock.data.SoundEvent;
@@ -62,18 +58,7 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
             return false;
         }
 
-        var downBlockState = dimension.getBlockState(placeBlockPos.x(), placeBlockPos.y() - 1, placeBlockPos.z());
-        BlockType<?> blockType1 = downBlockState.getBlockType();
-        if (!blockType1.getMaterial().isSolid()) {
-            return false;
-        }
-
-        var upBlockState = dimension.getBlockState(placeBlockPos.x(), placeBlockPos.y() + 1, placeBlockPos.z());
-        if (!upBlockState.getBlockType().hasBlockTag(VanillaBlockTags.REPLACEABLE)) {
-            return false;
-        }
-
-        BlockFace face =  BlockFace.SOUTH;
+        BlockFace face = BlockFace.SOUTH;
         if (placementInfo != null) {
             face = placementInfo.player().getHorizontalFace();
         }
@@ -120,14 +105,14 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
         if (super.onInteract(itemStack, dimension, interactInfo)) return true;
         if (interactInfo == null) return false;
 
-        Vector3i pos = (Vector3i) interactInfo.clickBlockPos();
+        Vector3ic pos = interactInfo.clickBlockPos();
         var blockState = dimension.getBlockState(pos);
 
         Vector3ic otherPos;
         if (blockState.getPropertyValue(UPPER_BLOCK_BIT)) {
-            otherPos = pos.sub(0, 1, 0);
+            otherPos = pos.sub(0, 1, 0, new Vector3i());
         } else {
-            otherPos = pos.add(0, 1, 0);
+            otherPos = pos.add(0, 1, 0,  new Vector3i());
         }
 
         var isOpen = !blockState.getPropertyValue(OPEN_BIT);
@@ -140,7 +125,7 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
     }
 
     @Override
-    public Set<ItemStack> getDrops(BlockStateWithPos blockState, ItemStack usedItem, Entity entity) {
-        return blockState.blockState().getPropertyValue(UPPER_BLOCK_BIT) ? Utils.EMPTY_ITEM_STACK_SET : super.getDrops(blockState, usedItem, entity);
+    public boolean isDroppable(BlockStateWithPos blockState, ItemStack usedItem, Entity entity) {
+        return !blockState.blockState().getPropertyValue(UPPER_BLOCK_BIT) && super.isDroppable(blockState, usedItem, entity);
     }
 }
