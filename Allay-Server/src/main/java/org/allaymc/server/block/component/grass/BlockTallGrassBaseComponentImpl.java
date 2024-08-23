@@ -4,6 +4,7 @@ import org.allaymc.api.block.BlockBehavior;
 import org.allaymc.api.block.component.PlayerInteractInfo;
 import org.allaymc.api.block.component.RequireBlockProperty;
 import org.allaymc.api.data.BlockFace;
+import org.allaymc.api.data.VanillaItemId;
 import org.allaymc.api.entity.Entity;
 import org.allaymc.api.item.ItemStack;
 import org.allaymc.api.item.type.ItemTypes;
@@ -27,8 +28,11 @@ import java.util.Set;
  */
 @RequireBlockProperty(type = BlockPropertyType.Type.BOOLEAN, name = "upper_block_bit")
 public class BlockTallGrassBaseComponentImpl extends BlockShortGrassBaseComponentImpl {
-    public BlockTallGrassBaseComponentImpl(BlockType<? extends BlockBehavior> blockType) {
+    protected final VanillaItemId shearDrop;
+
+    public BlockTallGrassBaseComponentImpl(BlockType<? extends BlockBehavior> blockType, VanillaItemId shearDrop) {
         super(blockType);
+        this.shearDrop = shearDrop;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class BlockTallGrassBaseComponentImpl extends BlockShortGrassBaseComponen
     @Override
     public Set<ItemStack> getDrops(BlockStateWithPos blockState, ItemStack usedItem, Entity entity) {
         if (usedItem.getItemType() == ItemTypes.SHEARS) {
-            return Set.of(ItemTypes.SHORT_GRASS.createItemStack(2));
+            return Set.of(shearDrop.getItemType().createItemStack(2));
         }
 
         return super.getDrops(blockState, usedItem, entity);
