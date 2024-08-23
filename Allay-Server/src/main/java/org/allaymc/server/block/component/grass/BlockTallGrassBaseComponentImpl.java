@@ -1,13 +1,17 @@
 package org.allaymc.server.block.component.grass;
 
 import org.allaymc.api.block.BlockBehavior;
+import org.allaymc.api.block.component.PlayerInteractInfo;
 import org.allaymc.api.block.component.RequireBlockProperty;
 import org.allaymc.api.data.BlockFace;
 import org.allaymc.api.block.BlockStateWithPos;
 import org.allaymc.api.block.property.type.BlockPropertyType;
 import org.allaymc.api.block.type.BlockState;
 import org.allaymc.api.block.type.BlockType;
-import org.allaymc.api.data.VanillaBlockPropertyTypes;
+import org.allaymc.api.world.Dimension;
+import org.joml.Vector3ic;
+
+import static org.allaymc.api.data.VanillaBlockPropertyTypes.UPPER_BLOCK_BIT;
 
 /**
  * Suitable for two-block high plants that can drop wheat seeds
@@ -23,23 +27,38 @@ public class BlockTallGrassBaseComponentImpl extends BlockShortGrassBaseComponen
     }
 
     @Override
-    public boolean canKeepExisting(BlockStateWithPos current, BlockStateWithPos neighbor, BlockFace face) {
-        if (face != BlockFace.UP && face != BlockFace.DOWN) return true;
-
-        var dimension = current.pos().dimension();
-        var isUpperBlock = current.blockState().getPropertyValue(VanillaBlockPropertyTypes.UPPER_BLOCK_BIT);
-        var willBreak = false;
-        if (isUpperBlock) {
-            willBreak = notSamePlant(dimension.getBlockState(BlockFace.DOWN.offsetPos(current.pos())));
-        } else {
-            willBreak = notSamePlant(dimension.getBlockState(BlockFace.UP.offsetPos(current.pos())));
-            if (!willBreak)
-                willBreak = !this.canPlaceOn(dimension.getBlockState(BlockFace.DOWN.offsetPos(current.pos())).getBlockType());
-        }
-        return !willBreak;
+    public boolean place(Dimension dimension, BlockState blockState, Vector3ic placeBlockPos, PlayerInteractInfo placementInfo) {
+        checkPlaceMethodParam(dimension, blockState, placeBlockPos, placementInfo);
+        dimension.setBlockState(
+                placeBlockPos.x(), placeBlockPos.y(), placeBlockPos.z(),
+                blockState,
+                placementInfo
+        );
+        dimension.setBlockState(
+                placeBlockPos.x(), placeBlockPos.y() + 1, placeBlockPos.z(),
+                blockState.setProperty(UPPER_BLOCK_BIT, true),
+                placementInfo
+        );
+        return true;
     }
 
-    protected boolean notSamePlant(BlockState downBlock) {
-        return downBlock.getBlockType() != blockType;
+    @Override
+    public boolean canKeepExisting(BlockStateWithPos current, BlockStateWithPos neighbor, BlockFace face) {
+        if (face == BlockFace.UP) {
+            if (!current.blockState().getPropertyValue(UPPER_BLOCK_BIT)) {
+                return !notSamePlant(neighbor.blockState());
+            }
+        } else if (face == BlockFace.DOWN) {
+            if (current.blockState().getPropertyValue(UPPER_BLOCK_BIT)) {
+                return !notSamePlant(neighbor.blockState());
+            }
+            return canPlaceOn(neighbor.blockState().getBlockType());
+        }
+
+        return true;
+    }
+
+    protected boolean notSamePlant(BlockState otherBlock) {
+        return otherBlock.getBlockType() != blockType;
     }
 }
