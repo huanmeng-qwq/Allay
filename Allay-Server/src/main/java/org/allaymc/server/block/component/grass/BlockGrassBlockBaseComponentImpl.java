@@ -40,8 +40,8 @@ public class BlockGrassBlockBaseComponentImpl extends BlockGrassBaseComponentImp
     @Override
     public void onRandomUpdate(BlockStateWithPos blockState) {
         if (mustDied) {
-            onDied(blockState, diedId.getBlockType().getDefaultState());
-            return;
+            if (died(blockState, diedId.getBlockType().getDefaultState())) return;
+            mustDied = false; // If died is cancelled, put mustDied to false
         }
         
         /**

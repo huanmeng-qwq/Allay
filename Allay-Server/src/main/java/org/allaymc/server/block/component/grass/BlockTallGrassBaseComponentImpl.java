@@ -24,7 +24,7 @@ import java.util.Set;
  * <p>
  * Allay Project 2024/6/18
  *
- * @author daoge_cmd
+ * @author daoge_cmd | Dhaiven
  */
 @RequireBlockProperty(type = BlockPropertyType.Type.BOOLEAN, name = "upper_block_bit")
 public class BlockTallGrassBaseComponentImpl extends BlockShortGrassBaseComponentImpl {

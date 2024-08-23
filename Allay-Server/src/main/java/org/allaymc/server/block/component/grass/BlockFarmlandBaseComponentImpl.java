@@ -41,7 +41,7 @@ public class BlockFarmlandBaseComponentImpl extends BlockGrassBaseComponentImpl 
             }
         } else {
             if (actualHydratation == MOISTURIZED_AMOUNT.getMin()) {
-                onDied(blockState, diedId.getBlockType().getDefaultState());
+                died(blockState, diedId.getBlockType().getDefaultState());
             } else {
                 changeHydratation(blockState, actualHydratation - 1);
             }
@@ -91,5 +91,6 @@ public class BlockFarmlandBaseComponentImpl extends BlockGrassBaseComponentImpl 
         updateBlockProperty(MOISTURIZED_AMOUNT, newHydratation, current.pos(), current.pos().dimension());
     }
 
-    //TODO: died when player fall on farmland
+    // TODO: died when player fall on farmland
+    // TODO: died when piston put down farmland block
 }

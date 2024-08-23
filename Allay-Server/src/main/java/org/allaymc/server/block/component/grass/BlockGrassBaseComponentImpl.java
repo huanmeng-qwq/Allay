@@ -7,6 +7,7 @@ import org.allaymc.api.block.type.BlockState;
 import org.allaymc.api.block.type.BlockType;
 import org.allaymc.api.data.BlockFace;
 import org.allaymc.api.data.VanillaBlockId;
+import org.allaymc.api.eventbus.event.block.BlockDiedEvent;
 import org.allaymc.server.block.component.BlockBaseComponentImpl;
 import org.joml.Vector3i;
 
@@ -29,14 +30,14 @@ public class BlockGrassBaseComponentImpl extends BlockBaseComponentImpl {
         var aboveBlockState = currentBlockState.pos().dimension().getBlockState(posAbove);
         var newBlockStateWithPos = new BlockStateWithPos(newBlockState, currentBlockState.pos(), currentBlockState.layer());
         if (mustDied(newBlockStateWithPos, aboveBlockState)) {
-            onDied(newBlockStateWithPos, diedId.getBlockType().getDefaultState());
+            died(newBlockStateWithPos, diedId.getBlockType().getDefaultState());
         }
     }
 
     @Override
     public boolean canKeepExisting(BlockStateWithPos current, BlockStateWithPos neighbor, BlockFace face) {
         if (face == BlockFace.UP && mustDied(current, neighbor.blockState())) {
-            onDied(current, diedId.getBlockType().getDefaultState());
+            died(current, diedId.getBlockType().getDefaultState());
         }
 
         return true;
@@ -48,8 +49,15 @@ public class BlockGrassBaseComponentImpl extends BlockBaseComponentImpl {
         return lightAbove <= 4 && blockAbove.getBlockStateData().light() >= 2;
     }
     
-    public void onDied(BlockStateWithPos current, BlockState newBlockState) {
-        // TODO: event
-        current.pos().dimension().setBlockState(current.pos(), newBlockState);
+    /**
+     * @return {@code true} if the block died else {@code false}
+     */
+    public boolean died(BlockStateWithPos current, BlockState newBlockState) {
+        var event = new BlockDiedEvent(current, newBlockState);
+        event.call();
+        if (event.isCancelled()) return false;
+
+        current.pos().dimension().setBlockState(current.pos(), event.getNewBlockState());
+        return true;
     }
 }

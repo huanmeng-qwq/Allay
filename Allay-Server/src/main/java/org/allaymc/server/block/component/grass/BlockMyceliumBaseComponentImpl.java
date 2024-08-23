@@ -10,6 +10,7 @@ import org.allaymc.api.block.type.BlockState;
 import org.allaymc.api.block.type.BlockType;
 import org.allaymc.api.block.type.BlockTypes;
 import org.allaymc.api.data.VanillaBlockId;
+import org.allaymc.api.eventbus.event.block.BlockSpreadEvent;
 import org.joml.Vector3i;
 
 import static org.allaymc.api.data.VanillaBlockPropertyTypes.DIRT_TYPE;
@@ -37,8 +38,8 @@ public class BlockMyceliumBaseComponentImpl extends BlockGrassBaseComponentImpl 
     @Override
     public void onRandomUpdate(BlockStateWithPos blockState) {
         if (mustDied) {
-            onDied(blockState, diedId.getBlockType().getDefaultState());
-            return;
+            if (died(blockState, diedId.getBlockType().getDefaultState())) return;
+            mustDied = false; // If died is cancelled, put mustDied to false
         }
         
         /**
@@ -58,8 +59,16 @@ public class BlockMyceliumBaseComponentImpl extends BlockGrassBaseComponentImpl 
             var abovePos = spreadPos.add(0, 1, 0, new Vector3i());
             BlockState blockStateAbove = pos.dimension().getBlockState(abovePos);
             if (blockStateAbove.getBlockType().getMaterial().isTransparent()) {
-                pos.dimension().setBlockState(spreadPos, BlockTypes.MYCELIUM.getDefaultState());
+                onSpread(blockState, spreadPos);
             }
+        }
+    }
+
+    public void onSpread(BlockStateWithPos current, Vector3i spreadPos) {
+        var event = new BlockSpreadEvent(current, spreadPos, BlockTypes.MYCELIUM.getDefaultState());
+        event.call();
+        if (!event.isCancelled()) {
+            current.pos().dimension().setBlockState(spreadPos, event.getNewBlockState());
         }
     }
 }
