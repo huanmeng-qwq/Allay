@@ -1,6 +1,8 @@
 package org.allaymc.server.network.processor;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.allaymc.api.block.BlockStateWithPos;
 import org.allaymc.api.block.component.PlayerInteractInfo;
 import org.allaymc.api.data.BlockFace;
 import org.allaymc.api.container.FullContainerType;
@@ -8,6 +10,7 @@ import org.allaymc.api.data.VanillaBlockTags;
 import org.allaymc.api.entity.component.common.EntityDamageComponent;
 import org.allaymc.api.entity.damage.DamageContainer;
 import org.allaymc.api.entity.interfaces.EntityPlayer;
+import org.allaymc.api.math.position.Position3i;
 import org.allaymc.api.network.processor.PacketProcessor;
 import org.allaymc.api.utils.MathUtils;
 import org.cloudburstmc.protocol.bedrock.data.inventory.transaction.InventorySource;
@@ -61,7 +64,8 @@ public class InventoryTransactionPacketProcessor extends PacketProcessor<Invento
                                 // Using item on the block successfully, no need to call BlockBehavior::onInteract()
                                 break;
                             }
-                            if (!interactedBlock.getBehavior().onInteract(itemInHand, dimension, interactInfo)) {
+                            var blockStateWithPos = new BlockStateWithPos(interactedBlock, new Position3i(clickBlockPos, dimension), 0);
+                            if (!interactedBlock.getBehavior().onInteract(blockStateWithPos, itemInHand, interactInfo)) {
                                 // Player interaction with the block was unsuccessful, possibly the plugin rolled back the event, need to override the client block change
                                 // Override the block change that was clicked
                                 var blockStateClicked = dimension.getBlockState(clickBlockPos);

@@ -55,16 +55,16 @@ public class BlockButtonBaseComponentImpl extends BlockBaseComponentImpl {
     }
 
     @Override
-    public boolean onInteract(ItemStack itemStack, Dimension dimension, PlayerInteractInfo interactInfo) {
-        if (super.onInteract(itemStack, dimension, interactInfo)) return true;
+    public boolean onInteract(BlockStateWithPos current, ItemStack itemStack, PlayerInteractInfo interactInfo) {
+        if (super.onInteract(current, itemStack, interactInfo)) return true;
 
-        var pos = interactInfo.clickBlockPos();
-        var blockState = dimension.getBlockState(pos);
-        if (!blockState.getPropertyValue(BUTTON_PRESSED_BIT)) {
-            updateBlockProperty(BUTTON_PRESSED_BIT, true, pos, dimension);
-            dimension.getBlockUpdateService().scheduleBlockUpdate(pos, getActivationTime());
-            dimension.addLevelSoundEvent(pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f, SoundEvent.BUTTON_CLICK_ON);
+        var pos = current.pos();
+        if (!current.blockState().getPropertyValue(BUTTON_PRESSED_BIT)) {
+            updateBlockProperty(BUTTON_PRESSED_BIT, true, pos);
+            pos.dimension().getBlockUpdateService().scheduleBlockUpdate(pos, getActivationTime());
+            pos.dimension().addLevelSoundEvent(pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f, SoundEvent.BUTTON_CLICK_ON);
         }
+
         return true;
     }
 
@@ -73,7 +73,7 @@ public class BlockButtonBaseComponentImpl extends BlockBaseComponentImpl {
         var pos = blockStateWithPos.pos();
         var blockState = blockStateWithPos.blockState();
         if (blockState.getPropertyValue(BUTTON_PRESSED_BIT)) {
-            updateBlockProperty(BUTTON_PRESSED_BIT, false, pos, pos.dimension());
+            updateBlockProperty(BUTTON_PRESSED_BIT, false, pos);
             pos.dimension().addLevelSoundEvent(pos.x() + 0.5f, pos.y() + 0.5f, pos.z() + 0.5f, SoundEvent.BUTTON_CLICK_OFF);
         }
     }

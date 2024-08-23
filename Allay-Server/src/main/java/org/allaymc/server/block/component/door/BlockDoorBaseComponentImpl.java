@@ -101,12 +101,12 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
     }
 
     @Override
-    public boolean onInteract(ItemStack itemStack, Dimension dimension, PlayerInteractInfo interactInfo) {
-        if (super.onInteract(itemStack, dimension, interactInfo)) return true;
+    public boolean onInteract(BlockStateWithPos current, ItemStack itemStack, PlayerInteractInfo interactInfo) {
+        if (super.onInteract(current, itemStack, interactInfo)) return true;
         if (interactInfo == null) return false;
 
-        Vector3ic pos = interactInfo.clickBlockPos();
-        var blockState = dimension.getBlockState(pos);
+        var pos = current.pos();
+        var blockState = current.blockState();
 
         Vector3ic otherPos;
         if (blockState.getPropertyValue(UPPER_BLOCK_BIT)) {
@@ -117,10 +117,10 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
 
         var isOpen = !blockState.getPropertyValue(OPEN_BIT);
 
-        updateBlockProperty(OPEN_BIT, isOpen, pos, dimension);
-        updateBlockProperty(OPEN_BIT, isOpen, otherPos, dimension);
+        updateBlockProperty(OPEN_BIT, isOpen, pos);
+        updateBlockProperty(OPEN_BIT, isOpen, otherPos, pos.dimension());
 
-        dimension.addLevelSoundEvent(pos.x(), pos.y(), pos.z(), isOpen ? SoundEvent.DOOR_OPEN : SoundEvent.DOOR_CLOSE);
+        pos.dimension().addLevelSoundEvent(pos.x(), pos.y(), pos.z(), isOpen ? SoundEvent.DOOR_OPEN : SoundEvent.DOOR_CLOSE);
         return true;
     }
 

@@ -13,6 +13,7 @@ import org.allaymc.api.data.VanillaEnchantmentTypes;
 import org.allaymc.api.entity.Entity;
 import org.allaymc.api.entity.component.common.EntityContainerHolderComponent;
 import org.allaymc.api.item.ItemStack;
+import org.allaymc.api.math.position.Position3ic;
 import org.allaymc.api.world.Dimension;
 import org.joml.Vector3ic;
 
@@ -32,6 +33,10 @@ public interface BlockBaseComponent extends BlockComponent {
      * @return block type
      */
     BlockType<? extends BlockBehavior> getBlockType();
+
+    default <DATATYPE> void updateBlockProperty(BlockPropertyType<DATATYPE> propertyType, DATATYPE value, Position3ic pos) {
+        updateBlockProperty(propertyType, value, pos.x(), pos.y(), pos.z(), pos.dimension(), 0);
+    }
 
     default <DATATYPE> void updateBlockProperty(BlockPropertyType<DATATYPE> propertyType, DATATYPE value, Vector3ic pos, Dimension dimension) {
         updateBlockProperty(propertyType, value, pos.x(), pos.y(), pos.z(), dimension, 0);
@@ -137,7 +142,7 @@ public interface BlockBaseComponent extends BlockComponent {
      * For example, right-clicking on the crafting table is normally considered a valid operation, so this method will return true
      * If false is returned, the useItemOn method of the player's item will continue to be called
      */
-    boolean onInteract(ItemStack itemStack, Dimension dimension, PlayerInteractInfo interactInfo);
+    boolean onInteract(BlockStateWithPos current, ItemStack itemStack, PlayerInteractInfo interactInfo);
 
     /**
      * Called when a block is replaced.
