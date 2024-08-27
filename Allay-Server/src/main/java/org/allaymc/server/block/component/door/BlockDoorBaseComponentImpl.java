@@ -43,8 +43,11 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
         DOOR_DIRECTION.put(BlockFace.NORTH, 3);
     }
 
-    public BlockDoorBaseComponentImpl(BlockType<? extends BlockBehavior> blockType) {
+    private final Boolean openableOnInteract;
+
+    public BlockDoorBaseComponentImpl(BlockType<? extends BlockBehavior> blockType, Boolean openableOnInteract) {
         super(blockType);
+        this.openableOnInteract = openableOnInteract;
     }
 
     @Override
@@ -103,8 +106,13 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
     @Override
     public boolean onInteract(BlockStateWithPos current, ItemStack itemStack, PlayerInteractInfo interactInfo) {
         if (super.onInteract(current, itemStack, interactInfo)) return true;
-        if (interactInfo == null) return false;
+        if (!openableOnInteract || interactInfo == null) return false;
 
+        open(current);
+        return true;
+    }
+
+    public void open(BlockStateWithPos current) {
         var pos = current.pos();
         var blockState = current.blockState();
 
@@ -121,7 +129,6 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
         updateBlockProperty(OPEN_BIT, isOpen, otherPos, pos.dimension());
 
         pos.dimension().addLevelSoundEvent(pos.x(), pos.y(), pos.z(), isOpen ? SoundEvent.DOOR_OPEN : SoundEvent.DOOR_CLOSE);
-        return true;
     }
 
     @Override

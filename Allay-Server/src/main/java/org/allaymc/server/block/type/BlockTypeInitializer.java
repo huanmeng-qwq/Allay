@@ -860,17 +860,38 @@ public final class BlockTypeInitializer {
     }
 
     public static void initDoors() {
-        BlockTypes.ACACIA_DOOR = buildWoodenDoor(BlockAcaciaDoorBehavior.class, VanillaBlockId.ACACIA_DOOR);
-        BlockTypes.BAMBOO_DOOR = buildWoodenDoor(BlockBambooDoorBehavior.class, VanillaBlockId.BAMBOO_DOOR);
-        BlockTypes.BIRCH_DOOR = buildWoodenDoor(BlockBirchDoorBehavior.class, VanillaBlockId.BIRCH_DOOR);
-        BlockTypes.CHERRY_DOOR = buildWoodenDoor(BlockCherryDoorBehavior.class, VanillaBlockId.CHERRY_DOOR);
-        BlockTypes.CRIMSON_DOOR = buildWoodenDoor(BlockCrimsonDoorBehavior.class, VanillaBlockId.CRIMSON_DOOR);
-        BlockTypes.DARK_OAK_DOOR = buildWoodenDoor(BlockDarkOakDoorBehavior.class, VanillaBlockId.DARK_OAK_DOOR);
-        BlockTypes.JUNGLE_DOOR = buildWoodenDoor(BlockJungleDoorBehavior.class, VanillaBlockId.JUNGLE_DOOR);
-        BlockTypes.MANGROVE_DOOR = buildWoodenDoor(BlockMangroveDoorBehavior.class, VanillaBlockId.MANGROVE_DOOR);
-        BlockTypes.WOODEN_DOOR = buildWoodenDoor(BlockWoodenDoorBehavior.class, VanillaBlockId.WOODEN_DOOR);
-        BlockTypes.SPRUCE_DOOR = buildWoodenDoor(BlockSpruceDoorBehavior.class, VanillaBlockId.SPRUCE_DOOR);
-        BlockTypes.WARPED_DOOR = buildWoodenDoor(BlockWarpedDoorBehavior.class, VanillaBlockId.WARPED_DOOR);
+        BlockTypes.ACACIA_DOOR = buildDoor(BlockAcaciaDoorBehavior.class, VanillaBlockId.ACACIA_DOOR, true);
+        BlockTypes.BAMBOO_DOOR = buildDoor(BlockBambooDoorBehavior.class, VanillaBlockId.BAMBOO_DOOR, true);
+        BlockTypes.BIRCH_DOOR = buildDoor(BlockBirchDoorBehavior.class, VanillaBlockId.BIRCH_DOOR, true);
+        BlockTypes.CHERRY_DOOR = buildDoor(BlockCherryDoorBehavior.class, VanillaBlockId.CHERRY_DOOR, true);
+        BlockTypes.CRIMSON_DOOR = buildDoor(BlockCrimsonDoorBehavior.class, VanillaBlockId.CRIMSON_DOOR, true);
+        BlockTypes.DARK_OAK_DOOR = buildDoor(BlockDarkOakDoorBehavior.class, VanillaBlockId.DARK_OAK_DOOR, true);
+        BlockTypes.JUNGLE_DOOR = buildDoor(BlockJungleDoorBehavior.class, VanillaBlockId.JUNGLE_DOOR, true);
+        BlockTypes.MANGROVE_DOOR = buildDoor(BlockMangroveDoorBehavior.class, VanillaBlockId.MANGROVE_DOOR, true);
+        BlockTypes.SPRUCE_DOOR = buildDoor(BlockSpruceDoorBehavior.class, VanillaBlockId.SPRUCE_DOOR, true);
+        BlockTypes.WARPED_DOOR = buildDoor(BlockWarpedDoorBehavior.class, VanillaBlockId.WARPED_DOOR, true);
+        BlockTypes.WOODEN_DOOR = buildDoor(BlockWoodenDoorBehavior.class, VanillaBlockId.WOODEN_DOOR, true);
+
+        BlockTypes.IRON_DOOR = buildDoor(BlockIronDoorBehavior.class, VanillaBlockId.IRON_DOOR, false);
+
+        BlockTypes.COPPER_DOOR = buildDoor(BlockCopperDoorBehavior.class, VanillaBlockId.COPPER_DOOR, true);
+        BlockTypes.EXPOSED_COPPER_DOOR = buildDoor(BlockExposedCopperDoorBehavior.class, VanillaBlockId.EXPOSED_COPPER_DOOR, true);
+        BlockTypes.OXIDIZED_COPPER_DOOR = buildDoor(BlockOxidizedCopperDoorBehavior.class, VanillaBlockId.OXIDIZED_COPPER_DOOR, true);
+        BlockTypes.WEATHERED_COPPER_DOOR = buildDoor(BlockWeatheredCopperDoorBehavior.class, VanillaBlockId.WEATHERED_COPPER_DOOR, true);
+
+        BlockTypes.WAXED_COPPER_DOOR = buildDoor(BlockWaxedCopperDoorBehavior.class, VanillaBlockId.WAXED_COPPER_DOOR, true);
+        BlockTypes.WAXED_EXPOSED_COPPER_DOOR = buildDoor(BlockWaxedExposedCopperDoorBehavior.class, VanillaBlockId.WAXED_EXPOSED_COPPER_DOOR, true);
+        BlockTypes.WAXED_OXIDIZED_COPPER_DOOR = buildDoor(BlockWaxedOxidizedCopperDoorBehavior.class, VanillaBlockId.WAXED_OXIDIZED_COPPER_DOOR, true);
+        BlockTypes.WAXED_WEATHERED_COPPER_DOOR = buildDoor(BlockWaxedWeatheredCopperDoorBehavior.class, VanillaBlockId.WAXED_WEATHERED_COPPER_DOOR, true);
+    }
+
+     private static <T extends BlockBehavior> BlockType<T> buildDoor(Class<T> clazz, VanillaBlockId vanillaBlockId, Boolean openableOnInteract) {
+        return BlockTypeBuilder
+                .builder(clazz)
+                .vanillaBlock(vanillaBlockId)
+                .setProperties(VanillaBlockPropertyTypes.DIRECTION, VanillaBlockPropertyTypes.DOOR_HINGE_BIT, VanillaBlockPropertyTypes.OPEN_BIT, VanillaBlockPropertyTypes.UPPER_BLOCK_BIT)
+                .setBlockBaseComponentSupplier(blockType -> new BlockDoorBaseComponentImpl(blockType, openableOnInteract))
+                .build();
     }
 
     public static void initRods() {
@@ -925,19 +946,6 @@ public final class BlockTypeInitializer {
                 .builder(clazz)
                 .vanillaBlock(vanillaBlockId)
                 .setProperties(VanillaBlockPropertyTypes.BUTTON_PRESSED_BIT, VanillaBlockPropertyTypes.FACING_DIRECTION)
-                .setBlockBaseComponentSupplier(blockBaseComponentSupplier)
-                .build();
-    }
-
-    private static <T extends BlockBehavior> BlockType<T> buildWoodenDoor(Class<T> clazz, VanillaBlockId vanillaBlockId) {
-        return buildDoor(clazz, vanillaBlockId, BlockDoorBaseComponentImpl::new);
-    }
-
-    private static <T extends BlockBehavior> BlockType<T> buildDoor(Class<T> clazz, VanillaBlockId vanillaBlockId, Function<BlockType<T>, BlockBaseComponent> blockBaseComponentSupplier) {
-        return BlockTypeBuilder
-                .builder(clazz)
-                .vanillaBlock(vanillaBlockId)
-                .setProperties(VanillaBlockPropertyTypes.DIRECTION, VanillaBlockPropertyTypes.DOOR_HINGE_BIT, VanillaBlockPropertyTypes.OPEN_BIT, VanillaBlockPropertyTypes.UPPER_BLOCK_BIT)
                 .setBlockBaseComponentSupplier(blockBaseComponentSupplier)
                 .build();
     }
