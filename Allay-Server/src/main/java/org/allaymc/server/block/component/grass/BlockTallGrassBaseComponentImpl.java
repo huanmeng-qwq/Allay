@@ -80,6 +80,11 @@ public class BlockTallGrassBaseComponentImpl extends BlockShortGrassBaseComponen
     }
 
     @Override
+    public boolean isDroppable(BlockStateWithPos blockState, ItemStack usedItem, Entity entity) {
+        return entity != null && super.isDroppable(blockState, usedItem, entity);
+    }
+
+    @Override
     public Set<ItemStack> getDrops(BlockStateWithPos blockState, ItemStack usedItem, Entity entity) {
         if (usedItem.getItemType() == ItemTypes.SHEARS) {
             return Set.of(shearDrop.getItemType().createItemStack(2));

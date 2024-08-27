@@ -133,6 +133,6 @@ public class BlockDoorBaseComponentImpl extends BlockBaseComponentImpl {
 
     @Override
     public boolean isDroppable(BlockStateWithPos blockState, ItemStack usedItem, Entity entity) {
-        return !blockState.blockState().getPropertyValue(UPPER_BLOCK_BIT) && super.isDroppable(blockState, usedItem, entity);
+        return entity != null && !blockState.blockState().getPropertyValue(UPPER_BLOCK_BIT) && super.isDroppable(blockState, usedItem, entity);
     }
 }
